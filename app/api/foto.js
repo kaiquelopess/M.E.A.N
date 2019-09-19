@@ -1,76 +1,70 @@
 var mongoose = require('mongoose');
 
-var api = {};
+module.exports = function(app) {
 
+	var api = {};
 
-var model = mongoose.model('Foto');
+	var model = mongoose.model('Foto', 'fotos');
 
+	api.lista = function(req, res) {
 
-api.Lista = function (req, res) {
+		model.find()
+		.then(function(fotos) {
+			res.json(fotos);
+		}, function(error) {
+			console.log(error);
+			res.sendStatus(500);
+		});
 
-    model
-        .find({})
-        .then(function (fotos) {
-            res.json(fotos);
-        }, function (error) {
-            console.log(error);
-            res.status(500).json(error);
-        })
+	};
+
+	api.buscaPorId = function(req, res) {
+
+		model.findById(req.params.id)
+		.then(function(foto) {
+			if (!foto) throw new Error('Foto não encontrada');
+			res.json(foto);
+		}, function(error) {
+			console.log(error);
+			res.sendStatus(500);
+		});
+	};
+
+	api.removePorId = function(req, res) {
+
+		model.remove({'_id' : req.params.id})
+		.then(function() {
+			res.sendStatus(200);
+		}, function(error) {
+			console.log(error);
+			res.sendStatus(500);
+		});
+
+	};
+
+	api.adiciona = function(req, res) {
+
+		model.create(req.body)
+		.then(function(foto) {
+			res.json(foto);
+		}, function(error) {
+			console.log('não conseguiu');
+			console.log(error);
+			res.sendStatus(500);
+		});
+	};
+
+	api.atualiza = function(req, res) {
+
+		model.findByIdAndUpdate(req.params.id, req.body)
+		.then(function(foto) {
+			res.json(foto);
+		}, function(error) {
+			console.log(error);
+			res.sendStatus(500);
+		})
+	};
+
+	return api;
 };
 
-
-api.buscaPorId = function (req, res) {
-
-    model
-        .findById(req.params.id)
-        .then(function (fotos) {
-            if (!fotos) throw Error('Foto não encontrada Ceceu')
-            res.json(fotos);
-
-        }, function (error) {
-            console.log(error);
-            res.status(404).json(error);
-
-        })
-
-};
-
-api.removePorId = function (req, res) {
-
-    model
-        .remove({ _id: req.params.id })
-        .then(function () {
-            res.sendStatus(204);
-        }, function (error) {
-            console.log(error);
-            res.status(404).json(error);
-        })
-
-};
-
-api.adiciona = function (req, res) {
-
-    model
-        .create(req.body)
-        .then(function (foto) {
-            res.json(foto);
-        }, function (error) {
-            console.log(error);
-            res.sendStatus(500).json(error);
-        })
-
-};
-
-api.atualiza = function (req, res) {
-
-    model
-        .findByIdAndUpdate(req.params.id, req.body)
-        .then(function (foto) {
-            res.json(foto);
-        }, function (error) {
-            console.log(error);
-            res.sendStatus(500).json(error);
-        })
-};
-
-module.exports = api;

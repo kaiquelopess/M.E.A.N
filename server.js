@@ -1,7 +1,8 @@
 var http = require('http');
 var app = require('./config/express');
-require('./config/database')('localhost/stackmean');
+require('./config/database')('mongodb://localhost/stackmean');
 
-http.createServer(app).listen(3000, () => {
-    console.log("Rodando na porta 3 mil kkk");
-})
+http.createServer(app)
+.listen(3000, function() {
+	console.log('Servidor iniciado');
+});
